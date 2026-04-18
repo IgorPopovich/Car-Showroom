@@ -1,4 +1,5 @@
-.app {
+/* Block: layout */
+.layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -6,7 +7,7 @@
   color: #e7eaf0;
 }
 
-.header {
+.layout__header {
   position: sticky;
   top: 0;
   z-index: 10;
@@ -15,7 +16,7 @@
   backdrop-filter: blur(10px);
 }
 
-.headerInner {
+.layout__header-inner {
   max-width: 1200px;
   padding: 14px 16px;
   margin: 0 auto;
@@ -25,7 +26,7 @@
   gap: 12px;
 }
 
-.logo {
+.layout__logo {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.2px;
@@ -33,13 +34,12 @@
   text-decoration: none;
 }
 
-.nav {
+.layout__nav {
   display: flex;
   gap: 12px;
 }
 
-.link,
-.active {
+.layout__link {
   font-size: 14px;
   padding: 8px 10px;
   border-radius: 10px;
@@ -47,13 +47,13 @@
   text-decoration: none;
 }
 
-.active {
+.layout__link--active {
   background: rgba(136, 92, 255, 0.18);
   color: #ffffff;
   border: 1px solid rgba(136, 92, 255, 0.35);
 }
 
-.main {
+.layout__main {
   flex: 1;
   max-width: 1200px;
   margin: 0 auto;
@@ -62,16 +62,15 @@
   box-sizing: border-box;
 }
 
-.footer {
+.layout__footer {
   border-top: 1px solid rgba(231, 234, 240, 0.12);
   background: #0b0f19;
 }
 
-.footerInner {
+.layout__footer-inner {
   max-width: 1200px;
   padding: 16px 16px;
   margin: 0 auto;
   font-size: 12px;
   color: rgba(231, 234, 240, 0.7);
 }
-

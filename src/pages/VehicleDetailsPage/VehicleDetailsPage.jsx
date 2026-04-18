@@ -13,12 +13,14 @@ import styles from './VehicleDetailsPage.module.css'
 const MAX_AUTHOR = 40
 const MAX_TEXT = 220
 
+const s = (name) => styles[`vehicle-details__${name}`]
+
 export default function VehicleDetailsPage() {
   const { vehicleId } = useParams()
   const dispatch = useAppDispatch()
 
-  const vehicle = useAppSelector((s) => selectVehicleById(s, vehicleId))
-  const comments = useAppSelector((s) => selectCommentsForVehicle(s, vehicleId))
+  const vehicle = useAppSelector((state) => selectVehicleById(state, vehicleId))
+  const comments = useAppSelector((state) => selectCommentsForVehicle(state, vehicleId))
 
   const [author, setAuthor] = useState('')
   const [text, setText] = useState('')
@@ -56,108 +58,106 @@ export default function VehicleDetailsPage() {
   }
 
   return (
-    <section className={styles.page}>
-      <div className={styles.breadcrumbs}>
-        <Link className={styles.back} to="/">
+    <section className={styles['vehicle-details']}>
+      <div className={s('breadcrumbs')}>
+        <Link className={s('back')} to="/">
           ← Back to list
         </Link>
       </div>
 
       {!vehicle && (
-        <div className={styles.state}>
+        <div className={s('state')}>
           Loading vehicle…
-          <div className={styles.stateSub}>
-            If you opened this page directly, we fetch only this vehicle once.
-          </div>
+          <div className={s('state-sub')}>If you opened this page directly, we fetch only this vehicle once.</div>
         </div>
       )}
 
       {vehicle && (
         <>
-          <div className={styles.header}>
-            <div className={styles.titleWrap}>
-              <h1 className={styles.h1}>{vehicle.title}</h1>
-              <div className={styles.meta}>
-                <span className={styles.pill}>{vehicle.brand ?? '—'}</span>
-                <span className={styles.pill}>${vehicle.price}</span>
-                <span className={styles.pill}>Rating {vehicle.rating}</span>
+          <div className={s('header')}>
+            <div className={s('title-wrap')}>
+              <h1 className={s('title')}>{vehicle.title}</h1>
+              <div className={s('meta')}>
+                <span className={s('pill')}>{vehicle.brand ?? '—'}</span>
+                <span className={s('pill')}>${vehicle.price}</span>
+                <span className={s('pill')}>Rating {vehicle.rating}</span>
               </div>
             </div>
           </div>
 
-          <div className={styles.content}>
-            <div className={styles.gallery}>
-              <img className={styles.hero} src={vehicle.thumbnail} alt={vehicle.title} />
+          <div className={s('content')}>
+            <div className={s('gallery')}>
+              <img className={s('hero')} src={vehicle.thumbnail} alt={vehicle.title} />
               {Array.isArray(vehicle.images) && vehicle.images.length > 1 && (
-                <div className={styles.thumbRow}>
+                <div className={s('thumbs')}>
                   {vehicle.images.slice(0, 6).map((src) => (
-                    <img key={src} className={styles.tiny} src={src} alt="" loading="lazy" />
+                    <img key={src} className={s('thumb')} src={src} alt="" loading="lazy" />
                   ))}
                 </div>
               )}
             </div>
 
-            <div className={styles.details}>
-              <div className={styles.block}>
-                <h2 className={styles.h2}>About</h2>
-                <p className={styles.desc}>{vehicle.description}</p>
+            <div className={s('details')}>
+              <div className={s('section')}>
+                <h2 className={s('heading')}>About</h2>
+                <p className={s('text')}>{vehicle.description}</p>
               </div>
 
-              <div className={styles.block}>
-                <h2 className={styles.h2}>Comments</h2>
+              <div className={s('section')}>
+                <h2 className={s('heading')}>Comments</h2>
 
-                <form className={styles.form} onSubmit={onSubmit}>
-                  <div className={styles.formRow}>
-                    <label className={styles.field}>
-                      <span className={styles.label}>Author</span>
+                <form className={s('form')} onSubmit={onSubmit}>
+                  <div className={s('form-row')}>
+                    <label className={s('field')}>
+                      <span className={s('label')}>Author</span>
                       <input
-                        className={styles.input}
+                        className={s('input')}
                         value={author}
                         onChange={(e) => setAuthor(e.target.value)}
                         onBlur={() => setTouched(true)}
                         placeholder="Your name"
                       />
-                      {authorErr && <span className={styles.err}>{authorErr}</span>}
+                      {authorErr && <span className={s('error')}>{authorErr}</span>}
                     </label>
 
-                    <button className={styles.btn} type="submit">
+                    <button className={s('submit')} type="submit">
                       Add
                     </button>
                   </div>
 
-                  <label className={styles.field}>
-                    <span className={styles.label}>Comment</span>
+                  <label className={s('field')}>
+                    <span className={s('label')}>Comment</span>
                     <textarea
-                      className={styles.textarea}
+                      className={s('textarea')}
                       value={text}
                       onChange={(e) => setText(e.target.value)}
                       onBlur={() => setTouched(true)}
                       placeholder="What do you think?"
                       rows={4}
                     />
-                    <div className={styles.hintRow}>
-                      <span className={styles.hint}>
+                    <div className={s('hint-row')}>
+                      <span className={s('hint')}>
                         {text.trim().length}/{MAX_TEXT}
                       </span>
-                      {textErr && <span className={styles.err}>{textErr}</span>}
+                      {textErr && <span className={s('error')}>{textErr}</span>}
                     </div>
                   </label>
                 </form>
 
-                <div className={styles.list}>
+                <div className={s('comments')}>
                   {comments.length === 0 ? (
-                    <div className={styles.empty}>No comments yet.</div>
+                    <div className={s('empty')}>No comments yet.</div>
                   ) : (
                     comments.map((c) => (
-                      <article className={styles.comment} key={c.id}>
-                        <div className={styles.commentTop}>
-                          <div className={styles.commentAuthor}>{c.author}</div>
-                          <div className={styles.commentRight}>
-                            <time className={styles.time}>
+                      <article className={s('comment')} key={c.id}>
+                        <div className={s('comment-header')}>
+                          <div className={s('comment-author')}>{c.author}</div>
+                          <div className={s('comment-actions')}>
+                            <time className={s('time')}>
                               {new Date(c.createdAt).toLocaleString()}
                             </time>
                             <button
-                              className={styles.del}
+                              className={s('delete')}
                               type="button"
                               onClick={() =>
                                 dispatch(deleteComment({ vehicleId, commentId: c.id }))
@@ -167,7 +167,7 @@ export default function VehicleDetailsPage() {
                             </button>
                           </div>
                         </div>
-                        <div className={styles.commentText}>{c.text}</div>
+                        <div className={s('comment-text')}>{c.text}</div>
                       </article>
                     ))
                   )}
@@ -180,4 +180,3 @@ export default function VehicleDetailsPage() {
     </section>
   )
 }
-
