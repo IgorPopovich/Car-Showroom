@@ -13,14 +13,14 @@ import type { RootState } from '../../app/store'
 
 export type VehiclesStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
 
-export type VehiclesState = EntityState<Vehicle> & {
+export type VehiclesState = EntityState<Vehicle, number> & {
   status: VehiclesStatus
   error: string | null
   loadingById: Record<string, boolean>
 }
 
-const vehiclesAdapter = createEntityAdapter<Vehicle>({
-  selectId: (v) => v.id,
+const vehiclesAdapter = createEntityAdapter<Vehicle, number>({
+  selectId: (v: Vehicle) => v.id,
   sortComparer: (a, b) => (a.title || '').localeCompare(b.title || ''),
 })
 
