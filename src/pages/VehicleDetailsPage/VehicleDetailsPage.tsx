@@ -99,7 +99,9 @@ export default function VehicleDetailsPage() {
     setTouched(true)
     if (!canSubmit || vehicleId === undefined) return
     dispatch(addComment({ vehicleId, author: author.trim(), text: text.trim() }))
+    setAuthor('')
     setText('')
+    setTouched(false)
   }
 
   return (
