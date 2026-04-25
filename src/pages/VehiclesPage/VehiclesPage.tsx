@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
@@ -15,7 +16,12 @@ import {
 } from '../../features/filters/filtersSlice'
 import styles from './VehiclesPage.module.css'
 
-function Field({ label, children }) {
+interface FieldProps {
+  label: string
+  children: ReactNode
+}
+
+function Field({ label, children }: FieldProps) {
   return (
     <label className={styles['vehicles-page__field']}>
       <span className={styles['vehicles-page__label']}>{label}</span>
@@ -33,7 +39,7 @@ export default function VehiclesPage() {
   const vehicles = useAppSelector(selectFilteredVehicles)
 
   useEffect(() => {
-    dispatch(fetchVehicles())
+    void dispatch(fetchVehicles())
   }, [dispatch])
 
   const brandOptions = useMemo(() => ['all', ...brands], [brands])

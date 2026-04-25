@@ -1,15 +1,36 @@
-import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit'
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSlice,
+  type EntityState,
+} from '@reduxjs/toolkit'
+import type { Vehicle } from '../../types/vehicle'
 import {
   fetchVehicleByIdFromDummyJson,
   fetchVehiclesFromDummyJson,
 } from '../../api/dummyjson'
+import type { RootState } from '../../app/store'
 
-const vehiclesAdapter = createEntityAdapter({
+export type VehiclesStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
+
+export type VehiclesState = EntityState<Vehicle> & {
+  status: VehiclesStatus
+  error: string | null
+  loadingById: Record<string, boolean>
+}
+
+const vehiclesAdapter = createEntityAdapter<Vehicle>({
   selectId: (v) => v.id,
   sortComparer: (a, b) => (a.title || '').localeCompare(b.title || ''),
 })
 
-export const fetchVehicles = createAsyncThunk(
+const initialState: VehiclesState = vehiclesAdapter.getInitialState({
+  status: 'idle',
+  error: null,
+  loadingById: {},
+})
+
+export const fetchVehicles = createAsyncThunk<Vehicle[], void, { state: RootState }>(
   'vehicles/fetchVehicles',
   async (_, { signal }) => {
     const data = await fetchVehiclesFromDummyJson({ signal })
@@ -24,12 +45,9 @@ export const fetchVehicles = createAsyncThunk(
   },
 )
 
-export const fetchVehicleById = createAsyncThunk(
+export const fetchVehicleById = createAsyncThunk<Vehicle, string, { state: RootState }>(
   'vehicles/fetchVehicleById',
-  async (id, { signal }) => {
-    const data = await fetchVehicleByIdFromDummyJson(id, { signal })
-    return data
-  },
+  async (id, { signal }) => fetchVehicleByIdFromDummyJson(id, { signal }),
   {
     condition: (id, { getState }) => {
       const state = getState()
@@ -41,12 +59,6 @@ export const fetchVehicleById = createAsyncThunk(
     },
   },
 )
-
-const initialState = vehiclesAdapter.getInitialState({
-  status: 'idle', // idle | loading | succeeded | failed
-  error: null,
-  loadingById: {},
-})
 
 const vehiclesSlice = createSlice({
   name: 'vehicles',
@@ -64,7 +76,7 @@ const vehiclesSlice = createSlice({
       })
       .addCase(fetchVehicles.rejected, (state, action) => {
         state.status = 'failed'
-        state.error = action.error?.message ?? 'Unknown error'
+        state.error = action.error.message ?? 'Unknown error'
       })
       .addCase(fetchVehicleById.pending, (state, action) => {
         state.loadingById[String(action.meta.arg)] = true
@@ -81,5 +93,4 @@ const vehiclesSlice = createSlice({
 
 export default vehiclesSlice.reducer
 
-export const vehiclesSelectors = vehiclesAdapter.getSelectors((state) => state.vehicles)
-
+export const vehiclesSelectors = vehiclesAdapter.getSelectors((state: RootState) => state.vehicles)

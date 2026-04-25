@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { fetchVehicleById } from '../../features/vehicles/vehiclesSlice'
@@ -13,7 +14,51 @@ import styles from './VehicleDetailsPage.module.css'
 const MAX_AUTHOR = 40
 const MAX_TEXT = 220
 
-const s = (name) => styles[`vehicle-details__${name}`]
+type VehicleDetailsElementClass =
+  | 'breadcrumbs'
+  | 'back'
+  | 'state'
+  | 'state-sub'
+  | 'header'
+  | 'title-wrap'
+  | 'title'
+  | 'meta'
+  | 'pill'
+  | 'content'
+  | 'gallery'
+  | 'hero'
+  | 'thumbs'
+  | 'thumb'
+  | 'details'
+  | 'section'
+  | 'heading'
+  | 'text'
+  | 'form'
+  | 'form-author'
+  | 'form-author-label'
+  | 'form-author-actions'
+  | 'field'
+  | 'label'
+  | 'input'
+  | 'textarea'
+  | 'submit'
+  | 'hint-row'
+  | 'hint'
+  | 'error'
+  | 'comments'
+  | 'empty'
+  | 'comment'
+  | 'comment-header'
+  | 'comment-author'
+  | 'comment-actions'
+  | 'time'
+  | 'delete'
+  | 'comment-text'
+
+function s(name: VehicleDetailsElementClass): string {
+  const key = `vehicle-details__${name}` as keyof typeof styles
+  return styles[key]
+}
 
 export default function VehicleDetailsPage() {
   const { vehicleId } = useParams()
@@ -27,8 +72,8 @@ export default function VehicleDetailsPage() {
   const [touched, setTouched] = useState(false)
 
   useEffect(() => {
-    if (!vehicleId) return
-    dispatch(fetchVehicleById(vehicleId))
+    if (vehicleId === undefined) return
+    void dispatch(fetchVehicleById(vehicleId))
   }, [dispatch, vehicleId])
 
   const authorErr = useMemo(() => {
@@ -49,10 +94,10 @@ export default function VehicleDetailsPage() {
 
   const canSubmit = !authorErr && !textErr && author.trim() && text.trim()
 
-  function onSubmit(e) {
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setTouched(true)
-    if (!canSubmit) return
+    if (!canSubmit || vehicleId === undefined) return
     dispatch(addComment({ vehicleId, author: author.trim(), text: text.trim() }))
     setText('')
   }
@@ -68,7 +113,9 @@ export default function VehicleDetailsPage() {
       {!vehicle && (
         <div className={s('state')}>
           Loading vehicle…
-          <div className={s('state-sub')}>If you opened this page directly, we fetch only this vehicle once.</div>
+          <div className={s('state-sub')}>
+            If you opened this page directly, we fetch only this vehicle once.
+          </div>
         </div>
       )}
 
@@ -107,22 +154,24 @@ export default function VehicleDetailsPage() {
                 <h2 className={s('heading')}>Comments</h2>
 
                 <form className={s('form')} onSubmit={onSubmit}>
-                  <div className={s('form-row')}>
-                    <label className={s('field')}>
-                      <span className={s('label')}>Author</span>
+                  <div className={s('form-author')}>
+                    <label className={s('form-author-label')} htmlFor="vehicle-comment-author">
+                      Author
+                    </label>
+                    <div className={s('form-author-actions')}>
                       <input
+                        id="vehicle-comment-author"
                         className={s('input')}
                         value={author}
                         onChange={(e) => setAuthor(e.target.value)}
                         onBlur={() => setTouched(true)}
                         placeholder="Your name"
                       />
-                      {authorErr && <span className={s('error')}>{authorErr}</span>}
-                    </label>
-
-                    <button className={s('submit')} type="submit">
-                      Add
-                    </button>
+                      <button className={s('submit')} type="submit">
+                        Add
+                      </button>
+                    </div>
+                    {authorErr && <span className={s('error')}>{authorErr}</span>}
                   </div>
 
                   <label className={s('field')}>
@@ -159,9 +208,10 @@ export default function VehicleDetailsPage() {
                             <button
                               className={s('delete')}
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                if (vehicleId === undefined) return
                                 dispatch(deleteComment({ vehicleId, commentId: c.id }))
-                              }
+                              }}
                             >
                               Delete
                             </button>

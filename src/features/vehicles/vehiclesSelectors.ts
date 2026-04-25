@@ -1,15 +1,16 @@
 import { createSelector } from '@reduxjs/toolkit'
+import type { RootState } from '../../app/store'
 import { vehiclesSelectors } from './vehiclesSlice'
 
-const selectFilters = (state) => state.filters
+const selectFilters = (state: RootState) => state.filters
 
 export const selectAllVehicles = vehiclesSelectors.selectAll
 
-export const selectVehicleById = (state, id) =>
-  vehiclesSelectors.selectById(state, Number(id))
+export const selectVehicleById = (state: RootState, id: string | undefined) =>
+  id === undefined ? undefined : vehiclesSelectors.selectById(state, Number(id))
 
 export const selectBrands = createSelector([selectAllVehicles], (vehicles) => {
-  const set = new Set()
+  const set = new Set<string>()
   for (const v of vehicles) {
     if (v.brand) set.add(v.brand)
   }
@@ -35,4 +36,3 @@ export const selectFilteredVehicles = createSelector(
     })
   },
 )
-

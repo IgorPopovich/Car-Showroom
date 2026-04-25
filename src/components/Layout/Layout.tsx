@@ -1,7 +1,12 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import styles from './Layout.module.css'
 
-export default function Layout({ children }) {
+interface LayoutProps {
+  children: ReactNode
+}
+
+export default function Layout({ children }: LayoutProps) {
   return (
     <div className={styles.layout}>
       <header className={styles.layout__header}>
